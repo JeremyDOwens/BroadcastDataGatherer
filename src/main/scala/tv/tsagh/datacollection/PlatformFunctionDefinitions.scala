@@ -37,11 +37,11 @@ object PlatformFunctionDefinitions {
         "http://api.azubu.tv/public/channel/live/list?limit=100&offset=",
         (i, _) => (i.toInt + 90).toString,
         a => (safeParse(a).getOrElse(JsNull) \ "data").asOpt[Seq[JsValue]].getOrElse(Nil),
-        a => (a \ "view_count").asOpt[Long].getOrElse(0.toLong),  
-        a => (a \ "followers_count").asOpt[Long].getOrElse(0.toLong),
+        a => (a \ "view_count").asOpt[Long].getOrElse(0L),  
+        a => (a \ "followers_count").asOpt[Long].getOrElse(0L),
         a => (a \ "user" \ "username").asOpt[String].getOrElse("").toLowerCase,
         a => (a \ "category" \ "title").asOpt[String].getOrElse(""),
-        a => (a \ "followers_count").asOpt[Long].getOrElse(0.toLong) >= 500,
+        a => (a \ "followers_count").asOpt[Long].getOrElse(0L) >= 500,
         Array()
         )
         
@@ -50,12 +50,12 @@ object PlatformFunctionDefinitions {
         "https://api.twitch.tv/kraken/streams?limit=100&offset=",
         (i, _) => (i.toInt + 90).toString,
         a => (safeParse(a).getOrElse(JsNull) \ "streams").asOpt[Seq[JsValue]].getOrElse(Nil),
-        a => (a \ "viewers").asOpt[Long].getOrElse(0.toLong), 
-        a => (a \ "channel" \ "followers").asOpt[Long].getOrElse(0.toLong), 
+        a => (a \ "viewers").asOpt[Long].getOrElse(0L), 
+        a => (a \ "channel" \ "followers").asOpt[Long].getOrElse(0L), 
         a => (a \ "channel" \ "name").asOpt[String].getOrElse(""), 
         a => (a \ "game").asOpt[String].getOrElse(""), 
         //Accept English speaking channels with at least 500 followers
-        a => (a \ "channel" \ "followers").asOpt[Long].getOrElse(0.toLong) >= 500 && (a \ "channel" \ "broadcaster_language").asOpt[String].getOrElse("") == "en",
+        a => (a \ "channel" \ "followers").asOpt[Long].getOrElse(0L) >= 500 && (a \ "channel" \ "broadcaster_language").asOpt[String].getOrElse("") == "en",
         Array(("Accept", "application/vnd.twitchtv.v3+json"),("Client-ID", conf.getString("TWITCH_API_KEY")))
         )
         
@@ -64,8 +64,8 @@ object PlatformFunctionDefinitions {
         "https://beam.pro/api/v1/channels?order=viewersCurrent:DESC&where=viewersCurrent:gte:10,numFollowers:gte:1000&fields=userId,token,viewersCurrent,numFollowers,type&page=",
         (i, _) => (i.toInt + 1).toString,
         a => safeParse(a).getOrElse(JsNull).asOpt[Seq[JsValue]].getOrElse(Nil),
-        a => (a \ "viewersCurrent").asOpt[Long].getOrElse(0.toLong),
-        a => (a \ "numFollowers").asOpt[Long].getOrElse(0.toLong),
+        a => (a \ "viewersCurrent").asOpt[Long].getOrElse(0L),
+        a => (a \ "numFollowers").asOpt[Long].getOrElse(0L),
         a => (a \ "token").asOpt[String].getOrElse(""),
         a => {
           val tp = (a \ "type").asOpt[JsValue].getOrElse("")
@@ -82,7 +82,7 @@ object PlatformFunctionDefinitions {
             (tpj \ "name").asOpt[String].getOrElse("")
           } else ""
           
-          (a \ "numFollowers").as[Long] >= 500
+          (a \ "numFollowers").asOpt[Long].getOrElse(0L) >= 500
         },
         Array()
         )
